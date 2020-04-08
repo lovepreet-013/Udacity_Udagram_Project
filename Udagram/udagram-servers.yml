@@ -11,6 +11,22 @@ Parameters:
 
 Resources:
 
+    RootRole:
+        Type: AWS::IAM::Role
+        Properties:
+          RoleName: 
+            !Sub ${EnvironmentName}-Role
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+            -   Effect: Allow
+                Principal:
+                    Service:
+                    - ec2.amazonaws.com
+                Action:
+                - sts:AssumeRole
+            Path: "/"
+
     LoadBalancerSecGroup:
         Type: AWS::EC2::SecurityGroup
         Properties:
@@ -54,10 +70,11 @@ Resources:
                 Fn::Base64: !Sub |
                     #!/bin/bash
                     apt-get update -y
+                    apt-get install unzip awscli -y
                     apt-get install apache2 -y
                     systemctl start apache2.service
                     cd /var/www/html
-                    echo "Udacity Demo Web Server Up and Running!" > index.html
+                    aws s3 cp s3://udacity-website-project-one/index.html
 
             ImageId: ami-005bdb005fb00e791
             SecurityGroups:
@@ -76,8 +93,8 @@ Resources:
                     !Sub "${EnvironmentName}-PRIV-NETS"
             LaunchConfigurationName:
                 Ref: WebAppLaunchConfig
-            MinSize: '3'
-            MaxSize: '5'
+            MinSize: '4'
+            MaxSize: '4'
             TargetGroupARNs:
             -   Ref: WebAppTargetGroup
 
