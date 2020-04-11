@@ -27,6 +27,30 @@ Resources:
                 - sts:AssumeRole
             Path: "/"
 
+    RolePolicies:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: AmazonS3ReadOnlyAccess
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                - 
+                    Effect: Allow
+                    Action: 
+                    -   s3:Get*
+                    -   s3:List*
+                    Resource: "*"
+            Roles:
+            -   Ref: RootRole
+
+    RootInstanceProfile:
+        Type: AWS::IAM::InstanceProfile
+        Properties:
+            Path: "/"
+            Roles:
+            - Ref: RootRole
+
+
     LoadBalancerSecGroup:
         Type: AWS::EC2::SecurityGroup
         Properties:
@@ -79,7 +103,7 @@ Resources:
             ImageId: ami-005bdb005fb00e791
             SecurityGroups:
             -   Ref: WebServerSecGroup
-            InstanceType: t3.medium
+            InstanceType: t3.micro
             BlockDeviceMappings:
             -   DeviceName: "/dev/sdk"
                 Ebs:
